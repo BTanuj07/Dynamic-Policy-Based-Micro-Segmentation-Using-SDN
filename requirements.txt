@@ -1,0 +1,32 @@
+# Python Requirements for SDN Micro-Segmentation Project
+# Install with: pip3 install -r requirements.txt
+
+# Ryu SDN Controller Framework
+ryu>=4.34
+
+# Network packet parsing
+eventlet>=0.30.2
+
+# Additional dependencies (usually installed with Ryu)
+netaddr>=0.8.0
+tinyrpc>=1.0.4
+ovs>=2.13.0
+
+# Web Dashboard
+flask>=2.0.0
+
+# Performance Monitoring
+psutil>=5.8.0
+
+# Cloud Security Features
+requests>=2.25.0
+pyyaml>=5.4.0
+
+# Machine Learning (Optional - for future enhancements)
+# scikit-learn>=1.0.0
+# numpy>=1.21.0
+
+# Note: Mininet and Open vSwitch must be installed separately:
+# sudo apt install mininet openvswitch-switch
+# Note: Tkinter is usually pre-installed with Python
+# Note: Docker and Docker Compose for containerized deployment

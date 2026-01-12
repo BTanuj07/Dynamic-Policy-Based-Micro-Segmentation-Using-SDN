@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # SDN Controller Service
+  sdn-controller:
+    build:
+      context: .
+      target: production
+    container_name: sdn-controller
+    ports:
+      - "6653:6653"  # OpenFlow port
+      - "5000:5000"  # Web dashboard
+    volumes:
+      - ./logs:/app/logs
+      - ./security_events.log:/app/security_events.log
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SDN_CONTROLLER_HOST=0.0.0.0
+      - SDN_CONTROLLER_PORT=6653
+    networks:
+      - sdn-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Web Dashboard Service
+  web-dashboard:
+    build:
+      context: .
+      target: production
+    container_name: sdn-dashboard
+    ports:
+      - "8080:5000"  # Alternative port for dashboard
+    volumes:
+      - ./logs:/app/logs
+      - ./security_events.log:/app/security_events.log
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FLASK_ENV=production
+    networks:
+      - sdn-network
+    depends_on:
+      - sdn-controller
+    restart: unless-stopped
+    command: ["python", "web_dashboard.py"]
+
+  # Cloud Security Controller Service
+  cloud-security:
+    build:
+      context: .
+      target: production
+    container_name: cloud-security-controller
+    volumes:
+      - ./logs:/app/logs
+      - ./cloud_security_events.log:/app/cloud_security_events.log
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - sdn-network
+    depends_on:
+      - sdn-controller
+    restart: unless-stopped
+    command: ["python", "cloud_security_controller.py"]
+
+  # Monitoring Service (Optional)
+  monitoring:
+    image: prom/prometheus:latest
+    container_name: sdn-monitoring
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - sdn-network
+    restart: unless-stopped
+
+networks:
+  sdn-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  sdn-logs:
+    driver: local

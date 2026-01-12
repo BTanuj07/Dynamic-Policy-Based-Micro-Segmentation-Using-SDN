@@ -1,0 +1,96 @@
+{
+  "roles": {
+    "HR": {
+      "description": "HR users with limited access to web services only",
+      "hosts": ["10.0.0.100"],
+      "allowed_access": [
+        {
+          "destination": "10.0.0.10",
+          "port": 80,
+          "protocol": "tcp",
+          "description": "HTTP access to web server"
+        },
+        {
+          "destination": "10.0.0.10",
+          "port": 443,
+          "protocol": "tcp", 
+          "description": "HTTPS access to web server"
+        }
+      ]
+    },
+    "ADMIN": {
+      "description": "Admin users with server access only (no user-to-user)",
+      "hosts": ["10.0.0.200"],
+      "allowed_access": [
+        {
+          "destination": "10.0.0.10",
+          "port": 80,
+          "protocol": "tcp",
+          "description": "HTTP access to web server"
+        },
+        {
+          "destination": "10.0.0.10", 
+          "port": 443,
+          "protocol": "tcp",
+          "description": "HTTPS access to web server"
+        },
+        {
+          "destination": "10.0.0.10",
+          "port": 22,
+          "protocol": "tcp",
+          "description": "SSH access to web server"
+        },
+        {
+          "destination": "10.0.0.20",
+          "port": 8080,
+          "protocol": "tcp",
+          "description": "Access to app server"
+        },
+        {
+          "destination": "10.0.0.20",
+          "port": 22,
+          "protocol": "tcp",
+          "description": "SSH access to app server"
+        },
+        {
+          "destination": "10.0.0.30",
+          "port": 3306,
+          "protocol": "tcp",
+          "description": "MySQL access to database"
+        },
+        {
+          "destination": "10.0.0.30",
+          "port": 22,
+          "protocol": "tcp",
+          "description": "SSH access to database"
+        }
+      ]
+    }
+  },
+  "server_dependencies": {
+    "description": "Legitimate server-to-server communication",
+    "allowed_flows": [
+      {
+        "source": "10.0.0.10",
+        "destination": "10.0.0.20", 
+        "port": 8080,
+        "protocol": "tcp",
+        "description": "Web server to app server"
+      },
+      {
+        "source": "10.0.0.20",
+        "destination": "10.0.0.30",
+        "port": 3306, 
+        "protocol": "tcp",
+        "description": "App server to database"
+      }
+    ]
+  },
+  "security_settings": {
+    "default_policy": "DENY",
+    "log_all_traffic": true,
+    "block_user_to_user": true,
+    "allow_icmp": true,
+    "session_timeout": 300
+  }
+}
